@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="utf-8" />
+	<title>Snake</title>
+	<style>	
+		.button {
+			position: absolute;;
+			top: 50px;
+			left: 400px;
+			text-align: center;
+			font-size: 45px;
+		}
+		.options_button {
+			font-size: 35px; 
+			width: 50px; 
+			height: 50px;
+		}
+	</style>
+</head>
+
+<body>
+   <canvas height='320' width='320' id='canvas'>Обновите браузер</canvas><p>
+	<script>
+		var canvas = document.getElementById("canvas");
+		var width = 10;
+		var height = 10;
+
+		var blockSize = 320/width;
+		var blockSizeF = blockSize - 7;
+
+		ctx = canvas.getContext('2d');
+	</script>
+<div class='button'>
+	<div>
+	<div style='font-size: 30px;'>Keyboard Navigation</div>
+		<button  class='options_button'>&#8593</button>
+	</div>
+	<div>
+		<button class='options_button'>&#8592</button>
+		<button class='options_button'>&#8594</button>
+	</div>
+	<div>
+		<button class='options_button'>&#8595</button>
+	</div>
+	<div>
+		<input type='button' value='New Game'style='font-size: 25px;' onClick='window.location.reload()' />
+	</div>
+</div>
+
+
+
+<!-- <button id='t1' &uarr>Pg UP</button><p>
+<button id='t3'&larr>Pg Left</button>
+<button id='t4'&rarr>Pg Right</button><p>
+<button id='t2'&darr>Pg Dn</button><p> -->
+<div>
+ Score <input id='score' style='font-size: 15px;'>    
+ Speed <input id='speed' style='font-size: 15px;'>
+</div>
+<script>
+	var sx = Math.floor(Math.random() * width);
+	var sy = Math.floor(Math.random() * height);
+
+	var fx = Math.floor(Math.random() * width);
+	var fy = Math.floor(Math.random() * height);
+	
+	var Sc = 0;
+	document.getElementById('score').value = Sc;
+	var delay = 1000;
+	var speed = 0;
+	document.getElementById('speed').value = speed;
+	var direction = Up;
+	
+
+	Snake = [[sx, sy]];
+
+	
+	
+	// init scene
+
+	function drawScene() {
+		color = "grey";
+		for (i = 0; i < width; i ++) 
+		 	for (j = 0; j < height; j ++) {
+		 		drawSquare(i,j,color);
+    	    }
+	}
+
+	function Control() {
+		for (i = 0; i < Snake.length; i++) {
+			for (j = 0; j < Snake[i].length; j++) {
+				if (j == 0) {
+					x = Snake[i][j];	       	
+	    		}    
+    			if (j == 1) {
+    				y = Snake[i][j];
+    			}	
+	    	}
+	    	if ((fx == x) && (fy == y)) {
+				fx = Math.floor(Math.random() * width);
+				fy = Math.floor(Math.random() * height);
+			}
+	    }			
+		redraw();	 
+	}
+
+	Control();	
+	
+	
+
+	document.onkeydown = function(event){
+	keyCode = event.keyCode; 
+	
+	switch(keyCode){      
+        // left
+        case 37:
+        direction = Lf;
+        break;
+        
+        // up
+        case 38:
+        direction = Up;
+        //Up();
+        break;
+        
+        // right
+        case 39:
+        direction = Rg;
+        break;
+        
+        // down
+        case 40:
+        direction = Dn;
+        
+        break;
+        
+        default:
+        break;
+	} 
+	}
+
+	function loop() {
+		direction();
+		redraw();
+		setTimeout(loop,delay);
+	}
+	loop();
+
+		
+	function Up() {
+		console.log('up');
+		move(0,-1);		
+	}
+
+	function Dn() {
+		console.log('dn');
+		move(0,1);	
+	}		
+
+	function Lf() {
+		console.log('left');
+		move(-1,0);	
+	}		
+	
+	function Rg() {
+		console.log('right');
+		move(1,0);		
+	}		
+
+	function move(x,y) {
+		var X = Snake[0][0] + x;
+		var Y = Snake[0][1] + y;
+
+		if (fx === X && fy === Y) {
+			Score();
+		} else {	
+			if(x > 0 && Snake[0][0] >= width -1) {
+				Snake.unshift([0,Snake[0][1]]);
+			} else if(x < 0 && Snake[0][0] <= 0) {
+				Snake.unshift([width - 1,Snake[0][1]]);
+			} else if(y > 0 && Snake[0][1] >= height - 1) {
+				Snake.unshift([Snake[0][0],0]);			
+			} else if(y < 0 && Snake[0][1] <= 0) {
+				Snake.unshift([Snake[0][0],height-1]);	
+			} else {
+				Snake.unshift([X,Y]);
+			}
+
+			Snake.pop();
+		}
+	}	
+
+	function drawSquare(x,y,color) {
+		ctx.fillStyle = color; 
+		ctx.fillRect(x*blockSize, y*blockSize, blockSizeF, blockSizeF); 
+    }
+
+	function redraw() {
+		drawScene();
+		drawSnake();
+		drawFood();
+				
+	}
+
+    function drawSnake() {
+    	color = "red"; 	
+	    for (i = 0; i < Snake.length; i++) {
+			for (j = 0; j < Snake[i].length; j++) {
+				if (j == 0) {
+					x = Snake[i][j];	       	
+	    		}
+	    		if (j == 1) {
+	    			y = Snake[i][j];
+	    		}
+	    	}  	
+	    drawSquare(x,y,color);
+	    }
+	}
+
+    function drawFood() {
+    	color = "yellow";
+        drawSquare(fx,fy,color);
+        
+    }
+    
+    function Score() {
+    	Sc = Sc + 1; 
+    	document.getElementById('score').value = Sc;
+    	if (delay > 100) {
+    		delay -= 50;
+    		speed += 50;
+    	} else { 
+    		delay = 100;
+    		speed = 900;
+    	}
+    	document.getElementById('speed').value = speed;
+    	Snake.splice(Snake[0],0,[fx,fy]);
+    	fx = Math.floor(Math.random() * width);
+		fy = Math.floor(Math.random() * height);
+		Control();
+    }
+
+  </script>
+
+    </body>
+</html>
